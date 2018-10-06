@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "live-server": "browser-sync start --files '**/*.html, **/*.js' --port 4000 --server",
+    "start:xhr": "npm run live-server ./01-ajax-xhr",
+    "start:jquery": "npm run live-server ./02-ajax-jQuery",
+    "start:fetch": "npm run live-server ./03-ajax-fetch"
   },
   "author": "",
   "license": "ISC",
