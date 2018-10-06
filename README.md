@@ -1,1 +1,1 @@
-# udacity-nanodegree-react
+# Udacity Nanodegree React Projects
