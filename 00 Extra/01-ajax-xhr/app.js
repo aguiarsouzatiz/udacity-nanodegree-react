@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
   targets.forEach(target => {
     const key = target.dataset.target
     const input = getElementBy(`[data-input="${key}"]`)
+    // console.log(input);
+
     if (localStorage.getItem(key)) input.value = localStorage.getItem(key)
   })
 
@@ -30,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const key = target.dataset.target
     const input = getElementBy(`[data-input="${key}"]`)
     const accessKey = input.value
-    console.log(input);
+    console.log(input)
     localStorage.setItem(key, accessKey)
   }))
 
@@ -58,7 +60,6 @@ function getAccessKeyOf(apiName) {
 function handleStorageOfAccessKey(apiName) {
   return localStorage.getItem(apiName) || getElementBy(`[data-input="${apiName}"]`).value
 }
-
 
 requestUnsplash.open('GET', `https://api.unsplash.com/search/photos?page=1&query=city`)
 requestUnsplash.onload = showResponse
