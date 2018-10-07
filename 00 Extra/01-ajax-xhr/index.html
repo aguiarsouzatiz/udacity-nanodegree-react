@@ -5,18 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Ajax XHR</title>
+  <link rel="stylesheet" href="https://unpkg.com/carbon-components/css/carbon-components.min.css" />
 </head>
 <body>
-  <section style="text-align:center">
+  <section class="bx--grid">
     <!-- <input style="display:block;margin:0 auto" type="text" name="unsplash-key" id="unsplash-key"> -->
-    <input type="text" name="access-key" id="access-key">
-    <button>show input value</button>
-    <button id="set-keys">set key access</button>
-    <form action="">
-        <input type="text" name="search-text" id="search-text">
-        <input type="submit" value="search">
-    </form>
+    <div class="bx--row">
+      <div class="bx--col-xs-12">
+        <div class="bx--form-item">
+            <input class="bx--text-input" type="text" name="access-key" id="access-key">
+        </div>
+        <div class="bx--form-item">
+            <button id="set-keys" class="bx--btn bx--btn--secondary bx--btn--sm">set key access</button>
+        </div>
+      </div>
+    </div>
+    <div class="bx--row">
+      <div class="bx--col-xs-12">
+          <form action="">
+              <div class="bx--form-item">
+                  <input class="bx--text-input" type="text" name="search-text" id="search-text">
+              </div>
+              <div class="bx--form-item">
+                  <input class="bx--btn bx--btn--primary" type="submit" value="search">
+              </div>
+          </form>
+      </div>
+    </div>
+
   </section>
+
   <script src="app.js"></script>
 </body>
 </html>
