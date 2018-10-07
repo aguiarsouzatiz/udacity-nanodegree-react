@@ -1,40 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Ajax XHR</title>
-  <link rel="stylesheet" href="https://unpkg.com/carbon-components/css/carbon-components.min.css" />
-</head>
-<body>
-  <section class="bx--grid">
-    <!-- <input style="display:block;margin:0 auto" type="text" name="unsplash-key" id="unsplash-key"> -->
-    <div class="bx--row">
-      <div class="bx--col-xs-12">
-        <div class="bx--form-item">
-            <input class="bx--text-input" type="text" name="access-key" id="access-key">
-        </div>
-        <div class="bx--form-item">
-            <button id="set-keys" class="bx--btn bx--btn--secondary bx--btn--sm">set key access</button>
-        </div>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax XHR</title>
+    <link rel="stylesheet" href="https://unpkg.com/carbon-components/css/carbon-components.min.css" />
+
+    <style>
+      .bx--margin-top-sm { margin-top: 5rem; }
+      .bx--form-item { margin-bottom: 2rem }
+    </style>
+
+  </head>
+
+  <body>
+    <!-- <div class="bx--loading-overlay">
+      <div data-loading class="bx--loading">
+        <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
+          <title>Loading</title>
+          <circle cx="0" cy="0" r="37.5" />
+        </svg>
       </div>
-    </div>
-    <div class="bx--row">
-      <div class="bx--col-xs-12">
-          <form action="">
+    </div> -->
+    <section class="bx--grid bx--margin-top-sm">
+
+      <div class="bx--row">
+        <div class="bx--col-md-10 bx--offset-md-1">
+          <div class="bx--row">
+            <div class="bx--col-xs-6">
               <div class="bx--form-item">
+                <label for="text-input-3" class="bx--label">Unsplash</label>
+                <input class="bx--text-input" data-input="unsplash" placeholder="Insert your access key from your developer account" type="text" name="unsplash">
+              </div>
+              <div class="bx--form-item">
+                <button data-event="set-keys" data-target="unsplash" class="bx--btn bx--btn--secondary bx--btn--sm">Set key access</button>
+              </div>
+            </div>
+            <div class="bx--col-xs-6">
+              <div class="bx--form-item">
+                <label for="text-input-3" class="bx--label">NY Times</label>
+                <input class="bx--text-input" data-input="nytimes" placeholder="Insert your access key you received in your email" type="text" name="nytimes">
+              </div>
+              <div class="bx--form-item">
+                <button data-event="set-keys" data-target="nytimes" class="bx--btn bx--btn--secondary bx--btn--sm">Set key access</button>
+              </div>
+            </div>
+          </div>
+          <div class="bx--row bx--margin-top-sm">
+            <div class="bx--col-xs-12">
+              <form action="">
+                <div class="bx--form-item">
                   <input class="bx--text-input" type="text" name="search-text" id="search-text">
-              </div>
-              <div class="bx--form-item">
-                  <input class="bx--btn bx--btn--primary" type="submit" value="search">
-              </div>
-          </form>
+                </div>
+                <div class="bx--form-item">
+                  <input class="bx--btn bx--btn--primary" type="submit" value="Search">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-  </section>
+    </section>
 
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
+
 </html>
