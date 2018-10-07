@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "live-server": "npm run browser-sync start --files '**/*.html, **/*.js' --port 4000 --server",
-    "babel-watch:xhr":"npm run babel 01-ajax-xhr/app.js --out-file=01-ajax-xhr/assets/transpiled.js --presets=env --watch",
-    "start:xhr": "babel-watch:xhr & live-server ./01-ajax-xhr",
+    "babel-watch:xhr":"babel 01-ajax-xhr/app.js --out-file=01-ajax-xhr/assets/transpiled.js --presets=env --watch",
+    "start:xhr": "npm run babel-watch:xhr & live-server ./01-ajax-xhr",
     "start:jquery": "npm run live-server ./02-ajax-jQuery",
     "start:fetch": "npm run live-server ./03-ajax-fetch"
   },
