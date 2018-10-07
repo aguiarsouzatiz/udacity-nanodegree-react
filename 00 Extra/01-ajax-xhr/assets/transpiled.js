@@ -64,10 +64,6 @@ function handleCookieEventsIn(inputTargets) {
   });
 }
 
-function showResponse(event) {
-  console.log(event);
-}
-
 function getElementBy(targetReference) {
   return document.querySelector(targetReference);
 }
@@ -87,14 +83,28 @@ function handleStorageOfAccessKey(apiName) {
   return extactContentOf(getCookieWith(apiName)).value || getElementBy('[data-input="' + apiName + '"]').value;
 }
 
-var requestUnsplash = new XMLHttpRequest();
-var searchForText = getElementBy('#search-text').value || '';
+var searchButton = getElementBy('[data-event="search-submit"]');
+// console.log(searchButton);
 
-requestUnsplash.open('GET', 'https://api.unsplash.com/search/photos?page=1&query=city');
-requestUnsplash.onload = showResponse;
-var accessKey = getAccessKeyOf('unsplash');
-requestUnsplash.setRequestHeader('Authorization', 'Client-ID ' + accessKey);
-// requestUnsplash.send()
+function showResponse(event) {
+  console.log(event);
+  console.log(this);
+}
+
+function openRequest(text) {
+  var requestUnsplash = new XMLHttpRequest();
+  requestUnsplash.open('GET', 'https://api.unsplash.com/search/photos?page=1&query=' + text);
+  requestUnsplash.onload = showResponse;
+  var accessKey = getAccessKeyOf('unsplash');
+  requestUnsplash.setRequestHeader('Authorization', 'Client-ID ' + accessKey);
+  requestUnsplash.send();
+}
+
+searchButton.addEventListener('click', function (event) {
+  var textToSearch = getElementBy('[data-input="search-text"]').value.trim();
+  console.log(textToSearch);
+  if (textToSearch) openRequest(textToSearch);
+});
 
 document.addEventListener('DOMContentLoaded', function () {
   var inputTargets = getEachElementsWith('[data-event="set-keys"]');
