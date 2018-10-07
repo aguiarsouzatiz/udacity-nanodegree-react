@@ -25,25 +25,34 @@ function extactContentOf(cookie) {
    return { key, value }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const targets = getEachElementsWith('[data-event="set-keys"]')
+function setDefaultCookieValueIn(inputTarget) {
+  const key = inputTarget.dataset.target
+  const input = getElementBy(`[data-input="${key}"]`)
+  const targetCookie = extactContentOf(getCookieWith(key))
 
-  targets.forEach(target => {
-    const key = target.dataset.target
-    const input = getElementBy(`[data-input="${key}"]`)
-    const targetCookie = extactContentOf(getCookieWith(key))
+  if (targetCookie) input.value = targetCookie.value
+}
 
-    if (targetCookie) input.value = targetCookie.value
-  })
-
-  targets.forEach(target => target.addEventListener('click', function() {
-    const key = target.dataset.target
+function setCookieValueFrom(inputTarget) {
+  return function() {
+    const key = inputTarget.dataset.target
     const input = getElementBy(`[data-input="${key}"]`)
     const accessKey = input.value
 
     document.cookie = `${key}=${accessKey};expires=${getCookieExpiredTime("one-day")};`
-  }))
-})
+  }
+}
+
+function applyEventToStoreCookieFrom(inputTarget) {
+  inputTarget.addEventListener('click', setCookieValueFrom(inputTarget))
+}
+
+function handleCookieEventsIn(inputTargets) {
+  inputTargets.forEach(input => {
+    setDefaultCookieValueIn(input)
+    applyEventToStoreCookieFrom(input)
+  })
+}
 
 function showResponse(event) {
   console.log(event)
@@ -76,3 +85,9 @@ requestUnsplash.onload = showResponse
 const accessKey = getAccessKeyOf('unsplash')
 requestUnsplash.setRequestHeader('Authorization', `Client-ID ${accessKey}`)
 // requestUnsplash.send()
+
+document.addEventListener('DOMContentLoaded', function() {
+  const inputTargets = getEachElementsWith('[data-event="set-keys"]')
+
+  handleCookieEventsIn(inputTargets)
+})

@@ -35,27 +35,34 @@ function extactContentOf(cookie) {
   return { key: key, value: value };
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  var targets = getEachElementsWith('[data-event="set-keys"]');
+function setDefaultCookieValueIn(inputTarget) {
+  var key = inputTarget.dataset.target;
+  var input = getElementBy('[data-input="' + key + '"]');
+  var targetCookie = extactContentOf(getCookieWith(key));
 
-  targets.forEach(function (target) {
-    var key = target.dataset.target;
+  if (targetCookie) input.value = targetCookie.value;
+}
+
+function setCookieValueFrom(inputTarget) {
+  return function () {
+    var key = inputTarget.dataset.target;
     var input = getElementBy('[data-input="' + key + '"]');
-    var targetCookie = extactContentOf(getCookieWith(key));
+    var accessKey = input.value;
 
-    if (targetCookie) input.value = targetCookie.value;
+    document.cookie = key + '=' + accessKey + ';expires=' + getCookieExpiredTime("one-day") + ';';
+  };
+}
+
+function applyEventToStoreCookieFrom(inputTarget) {
+  inputTarget.addEventListener('click', setCookieValueFrom(inputTarget));
+}
+
+function handleCookieEventsIn(inputTargets) {
+  inputTargets.forEach(function (input) {
+    setDefaultCookieValueIn(input);
+    applyEventToStoreCookieFrom(input);
   });
-
-  targets.forEach(function (target) {
-    return target.addEventListener('click', function () {
-      var key = target.dataset.target;
-      var input = getElementBy('[data-input="' + key + '"]');
-      var accessKey = input.value;
-
-      document.cookie = key + '=' + accessKey + ';expires=' + getCookieExpiredTime("one-day") + ';';
-    });
-  });
-});
+}
 
 function showResponse(event) {
   console.log(event);
@@ -88,3 +95,9 @@ requestUnsplash.onload = showResponse;
 var accessKey = getAccessKeyOf('unsplash');
 requestUnsplash.setRequestHeader('Authorization', 'Client-ID ' + accessKey);
 // requestUnsplash.send()
+
+document.addEventListener('DOMContentLoaded', function () {
+  var inputTargets = getEachElementsWith('[data-event="set-keys"]');
+
+  handleCookieEventsIn(inputTargets);
+});
