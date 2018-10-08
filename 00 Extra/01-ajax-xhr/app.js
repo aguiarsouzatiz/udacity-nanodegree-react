@@ -73,26 +73,82 @@ function setImageResultHTMLTemplateBy(url) {
           </figure>`
 }
 
-function renderResults(event) {
-  const placeToInjectResults = getElementBy('[data-inject="search-results"]')
+function setArticleResultHTMLTemplateBy({snippet, web_url}) {
+  return `<div class="bx--margin-bottom-xs">
+            <p>${snippet}</p>
+            <footer>
+              <a class="bx--link" href="${web_url}">Read the article</a>
+            </footer>
+          </div>`
+}
+
+function setLoadingHTMLTemplate() {
+  return `<!-- <div class="bx--loading-overlay">
+            <div data-loading class="bx--loading">
+              <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
+                <title>Loading</title>
+                <circle cx="0" cy="0" r="37.5" />
+              </svg>
+            </div>
+          </div> -->`
+}
+
+function removePreviousResultsOf(element) {
+  return element.innerHTML = ''
+}
+
+function setLoadingStateIn(element) {
+  removePreviousResultsOf(element)
+  return element.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate())
+}
+
+function renderResultsUnsplash(event) {
+  const placeToInjectResults = getElementBy('[data-inject="image-results"]')
+  setLoadingStateIn(placeToInjectResults)
+
   const data = JSON.parse(event.target.responseText)
+  removePreviousResultsOf(placeToInjectResults)
+
   data.results.forEach(({urls}) => {
     const htmlContent = setImageResultHTMLTemplateBy(urls.thumb)
     return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
   })
 }
 
-function makeRequestTo(textToSearch) {
-  const requestUnsplash = new XMLHttpRequest();
-  requestUnsplash.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`)
-  requestUnsplash.setRequestHeader('Authorization', `Client-ID ${getAccessKeyOf('unsplash')}`)
-  requestUnsplash.onload = renderResults
-  requestUnsplash.send()
+function renderResultsNY(event) {
+  const placeToInjectResults = getElementBy('[data-inject="article-results"]')
+  setLoadingStateIn(placeToInjectResults)
+
+  const data = JSON.parse(event.target.responseText)
+  removePreviousResultsOf(placeToInjectResults)
+
+  data.response.docs.forEach(data => {
+    const htmlContent = setArticleResultHTMLTemplateBy(data)
+    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
+  })
+}
+
+function makeRequestUnsplash(textToSearch) {
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`)
+  request.setRequestHeader('Authorization', `Client-ID ${getAccessKeyOf('unsplash')}`)
+  request.onload = renderResultsUnsplash
+  request.send()
+}
+
+function makeRequestNY(textToSearch) {
+  const request = new XMLHttpRequest();
+  request.open('GET', `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${textToSearch}&api-key=${getAccessKeyOf('nytimes')}`)
+  request.onload = renderResultsNY
+  request.send()
 }
 
 function searchInput(event) {
   const textToSearch = getElementBy('[data-input="search-text"]').value.trim()
-  if (textToSearch) makeRequestTo(textToSearch)
+  if (textToSearch) {
+    makeRequestUnsplash(textToSearch)
+    makeRequestNY(textToSearch)
+  }
 }
 
 function conditionalSearch(event) {

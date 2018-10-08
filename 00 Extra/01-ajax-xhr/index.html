@@ -10,20 +10,13 @@
 
     <style>
       .bx--margin-top-sm { margin-top: 5rem; }
+      .bx--margin-bottom-xs { margin-top: 2.5rem; }
       .bx--form-item { margin-bottom: 2rem }
     </style>
 
   </head>
 
   <body>
-    <!-- <div class="bx--loading-overlay">
-      <div data-loading class="bx--loading">
-        <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
-          <title>Loading</title>
-          <circle cx="0" cy="0" r="37.5" />
-        </svg>
-      </div>
-    </div> -->
     <section class="bx--grid bx--margin-top-sm">
 
       <div class="bx--row">
@@ -61,7 +54,10 @@
               <!-- </form> -->
             </div>
           </div>
-          <div id="search-results" class="bx--row" data-inject="search-results"></div>
+          <div id="search-results" class="bx--row" data-inject="search-results">
+              <div class="bx--row" data-inject="image-results"></div>
+              <div class="bx--row" data-inject="article-results"></div>
+          </div>
         </div>
       </div>
 

@@ -82,28 +82,75 @@ function setImageResultHTMLTemplateBy(url) {
   return '<figure>\n            <img src="' + url + '">\n          </figure>';
 }
 
-function renderResults(event) {
-  var placeToInjectResults = getElementBy('[data-inject="search-results"]');
+function setArticleResultHTMLTemplateBy(_ref) {
+  var snippet = _ref.snippet,
+      web_url = _ref.web_url;
+
+  return '<div class="bx--margin-bottom-xs">\n            <p>' + snippet + '</p>\n            <footer>\n              <a class="bx--link" href="' + web_url + '">Read the article</a>\n            </footer>\n          </div>';
+}
+
+function setLoadingHTMLTemplate() {
+  return '<!-- <div class="bx--loading-overlay">\n            <div data-loading class="bx--loading">\n              <svg class="bx--loading__svg" viewBox="-75 -75 150 150">\n                <title>Loading</title>\n                <circle cx="0" cy="0" r="37.5" />\n              </svg>\n            </div>\n          </div> -->';
+}
+
+function removePreviousResultsOf(element) {
+  return element.innerHTML = '';
+}
+
+function setLoadingStateIn(element) {
+  removePreviousResultsOf(element);
+  return element.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate());
+}
+
+function renderResultsUnsplash(event) {
+  var placeToInjectResults = getElementBy('[data-inject="image-results"]');
+  setLoadingStateIn(placeToInjectResults);
+
   var data = JSON.parse(event.target.responseText);
-  data.results.forEach(function (_ref) {
-    var urls = _ref.urls;
+  removePreviousResultsOf(placeToInjectResults);
+
+  data.results.forEach(function (_ref2) {
+    var urls = _ref2.urls;
 
     var htmlContent = setImageResultHTMLTemplateBy(urls.thumb);
     return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent);
   });
 }
 
-function makeRequestTo(textToSearch) {
-  var requestUnsplash = new XMLHttpRequest();
-  requestUnsplash.open('GET', 'https://api.unsplash.com/search/photos?page=1&query=' + textToSearch);
-  requestUnsplash.setRequestHeader('Authorization', 'Client-ID ' + getAccessKeyOf('unsplash'));
-  requestUnsplash.onload = renderResults;
-  requestUnsplash.send();
+function renderResultsNY(event) {
+  var placeToInjectResults = getElementBy('[data-inject="article-results"]');
+  setLoadingStateIn(placeToInjectResults);
+
+  var data = JSON.parse(event.target.responseText);
+  removePreviousResultsOf(placeToInjectResults);
+
+  data.response.docs.forEach(function (data) {
+    var htmlContent = setArticleResultHTMLTemplateBy(data);
+    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent);
+  });
+}
+
+function makeRequestUnsplash(textToSearch) {
+  var request = new XMLHttpRequest();
+  request.open('GET', 'https://api.unsplash.com/search/photos?page=1&query=' + textToSearch);
+  request.setRequestHeader('Authorization', 'Client-ID ' + getAccessKeyOf('unsplash'));
+  request.onload = renderResultsUnsplash;
+  request.send();
+}
+
+function makeRequestNY(textToSearch) {
+  var request = new XMLHttpRequest();
+  request.open('GET', 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + textToSearch + '&api-key=' + getAccessKeyOf('nytimes'));
+  request.onload = renderResultsNY;
+  request.send();
 }
 
 function searchInput(event) {
   var textToSearch = getElementBy('[data-input="search-text"]').value.trim();
-  if (textToSearch) makeRequestTo(textToSearch);
+  if (textToSearch) {
+    makeRequestUnsplash(textToSearch);
+    makeRequestNY(textToSearch);
+  }
 }
 
 function conditionalSearch(event) {
@@ -114,10 +161,10 @@ function getActionsToHTMLElements() {
   return [{ target: getElementBy('[data-event="search-submit"]'), event: 'click', action: searchInput }, { target: document, event: 'keyup', action: conditionalSearch }];
 }
 
-getActionsToHTMLElements().forEach(function (_ref2) {
-  var target = _ref2.target,
-      event = _ref2.event,
-      action = _ref2.action;
+getActionsToHTMLElements().forEach(function (_ref3) {
+  var target = _ref3.target,
+      event = _ref3.event,
+      action = _ref3.action;
 
   target.addEventListener(event, action);
 });
