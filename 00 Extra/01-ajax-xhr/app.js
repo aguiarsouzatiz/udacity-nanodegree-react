@@ -1,10 +1,4 @@
 
-
-// const apiCredentials = [
-  // {key: 'unsplash'},
-  // {key: 'nytimes'},
-// ]
-
 function setTimeValueBy(time='one-day') {
   return {'1-minute': 60, '10-minutes': 60 * 10, 'one-hour': 60 * 60, 'one-day': 60 * 60 * 24 }[time]
 }
@@ -73,27 +67,47 @@ function handleStorageOfAccessKey(apiName) {
   return extactContentOf(getCookieWith(apiName)).value || getElementBy(`[data-input="${apiName}"]`).value
 }
 
-const searchButton = getElementBy('[data-event="search-submit"]')
-// console.log(searchButton);
-
-function showResponse(event) {
-  console.log(event)
-  console.log(this)
+function setImageResultHTMLTemplateBy(url) {
+  return `<figure>
+            <img src="${url}">
+          </figure>`
 }
 
-function openRequest(text) {
+function renderResults(event) {
+  const placeToInjectResults = getElementBy('[data-inject="search-results"]')
+  const data = JSON.parse(event.target.responseText)
+  data.results.forEach(({urls}) => {
+    const htmlContent = setImageResultHTMLTemplateBy(urls.thumb)
+    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
+  })
+}
+
+function makeRequestTo(textToSearch) {
   const requestUnsplash = new XMLHttpRequest();
-  requestUnsplash.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${text}`)
-  requestUnsplash.onload = showResponse
-  const accessKey = getAccessKeyOf('unsplash')
-  requestUnsplash.setRequestHeader('Authorization', `Client-ID ${accessKey}`)
+  requestUnsplash.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`)
+  requestUnsplash.setRequestHeader('Authorization', `Client-ID ${getAccessKeyOf('unsplash')}`)
+  requestUnsplash.onload = renderResults
   requestUnsplash.send()
 }
 
-searchButton.addEventListener('click', function(event) {
+function searchInput(event) {
   const textToSearch = getElementBy('[data-input="search-text"]').value.trim()
-  console.log(textToSearch);
-  if (textToSearch) openRequest(textToSearch)
+  if (textToSearch) makeRequestTo(textToSearch)
+}
+
+function conditionalSearch(event) {
+	if (event.keyCode === 13) searchInput(event)
+}
+
+function getActionsToHTMLElements() {
+  return [
+    { target: getElementBy('[data-event="search-submit"]'),  event: 'click', action: searchInput },
+    { target: document,  event: 'keyup', action: conditionalSearch }
+  ]
+}
+
+getActionsToHTMLElements().forEach(({ target, event, action }) => {
+  target.addEventListener(event, action)
 })
 
 document.addEventListener('DOMContentLoaded', function() {
