@@ -11,12 +11,15 @@ function getCookieExpiredTime(time) {
 
 function getCookieWith(key) {
   const cookies = document.cookie.split(';')
-  return cookies.find(cookie => cookie.includes(key)).trim()
+  const foundKeyCookie = cookies.find(cookie => cookie.includes(key))
+  if (foundKeyCookie) return foundKeyCookie.trim()
 }
 
-function extactContentOf(cookie) {
-   const [ key, value ] = cookie.split('\=')
-   return { key, value }
+function extactContentOf(hasCookie) {
+  if (hasCookie) {
+    const [ key, value ] = hasCookie.split('\=')
+    return { key, value }
+  }
 }
 
 function setDefaultCookieValueIn(inputTarget) {
@@ -83,14 +86,14 @@ function setArticleResultHTMLTemplateBy({snippet, web_url}) {
 }
 
 function setLoadingHTMLTemplate() {
-  return `<!-- <div class="bx--loading-overlay">
+  return `<div class="bx--loading-overlay">
             <div data-loading class="bx--loading">
               <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
                 <title>Loading</title>
                 <circle cx="0" cy="0" r="37.5" />
               </svg>
             </div>
-          </div> -->`
+          </div>`
 }
 
 function removePreviousResultsOf(element) {
@@ -155,14 +158,14 @@ function conditionalSearch(event) {
 	if (event.keyCode === 13) searchInput(event)
 }
 
-function getActionsToHTMLElements() {
+function setActionsToHTMLElements() {
   return [
     { target: getElementBy('[data-event="search-submit"]'),  event: 'click', action: searchInput },
     { target: document,  event: 'keyup', action: conditionalSearch }
   ]
 }
 
-getActionsToHTMLElements().forEach(({ target, event, action }) => {
+setActionsToHTMLElements().forEach(({ target, event, action }) => {
   target.addEventListener(event, action)
 })
 
