@@ -86,7 +86,7 @@ function setArticleResultHTMLTemplateBy({snippet, web_url}) {
 }
 
 function setLoadingHTMLTemplate() {
-  return `<div class="bx--loading-overlay">
+  return `<div class="bx--loading-overlay" data-inject="loading">
             <div data-loading class="bx--loading">
               <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
                 <title>Loading</title>
@@ -131,6 +131,16 @@ function renderResultsNY(event) {
   })
 }
 
+function makeSearchRequestFrom(apiName, textToSearch) {
+  const { url, hasHeader, header } = getRequestReferencesOf(apiName)
+  const request = new XMLHttpRequest();
+  request.open('GET', setUrlFrom().toSearch(textToSearch))
+  if (hasHeader) request.setRequestHeader('Authorization', `setHeader()`)
+
+  request.onload = renderResultsUnsplash
+  request.send()
+}
+
 function makeRequestUnsplash(textToSearch) {
   const request = new XMLHttpRequest();
   request.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`)
@@ -147,10 +157,17 @@ function makeRequestNY(textToSearch) {
 }
 
 function searchInput(event) {
+  const place = getElementBy('[data-inject="search-results"]')
+  place.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate())
+
   const textToSearch = getElementBy('[data-input="search-text"]').value.trim()
   if (textToSearch) {
-    makeRequestUnsplash(textToSearch)
-    makeRequestNY(textToSearch)
+    setTimeout(() => {
+      const loading = place.querySelector('[data-inject="loading"]')
+      makeRequestUnsplash(textToSearch)
+      makeRequestNY(textToSearch)
+      loading.remove()
+    }, 3000)
   }
 }
 
