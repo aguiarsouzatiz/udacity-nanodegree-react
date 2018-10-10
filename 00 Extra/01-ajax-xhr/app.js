@@ -15,7 +15,7 @@ function getCookieWith(key) {
   if (foundKeyCookie) return foundKeyCookie.trim()
 }
 
-function extactContentOf(hasCookie) {
+function extarctContentOf(hasCookie) {
   if (hasCookie) {
     const [ key, value ] = hasCookie.split('\=')
     return { key, value }
@@ -25,7 +25,7 @@ function extactContentOf(hasCookie) {
 function setDefaultCookieValueIn(inputTarget) {
   const key = inputTarget.dataset.target
   const input = getElementBy(`[data-input="${key}"]`)
-  const targetCookie = extactContentOf(getCookieWith(key))
+  const targetCookie = extarctContentOf(getCookieWith(key))
 
   if (targetCookie) input.value = targetCookie.value
 }
@@ -67,12 +67,12 @@ function getAccessKeyOf(apiName) {
 }
 
 function handleStorageOfAccessKey(apiName) {
-  return extactContentOf(getCookieWith(apiName)).value || getElementBy(`[data-input="${apiName}"]`).value
+  return extarctContentOf(getCookieWith(apiName)).value || getElementBy(`[data-input="${apiName}"]`).value
 }
 
-function setImageResultHTMLTemplateBy(url) {
+function setImageResultHTMLTemplateBy({urls}) {
   return `<figure>
-            <img src="${url}">
+            <img src="${urls.thumb}">
           </figure>`
 }
 
@@ -96,64 +96,51 @@ function setLoadingHTMLTemplate() {
           </div>`
 }
 
+function setHTMLTemplateOf(apiName) {
+  return {
+    'nytimes': setArticleResultHTMLTemplateBy,
+    'unsplash': setImageResultHTMLTemplateBy
+  }[apiName]
+}
+
 function removePreviousResultsOf(element) {
   return element.innerHTML = ''
 }
 
-function setLoadingStateIn(element) {
-  removePreviousResultsOf(element)
-  return element.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate())
-}
-
-function renderResultsUnsplash(event) {
-  const placeToInjectResults = getElementBy('[data-inject="image-results"]')
-  setLoadingStateIn(placeToInjectResults)
-
-  const data = JSON.parse(event.target.responseText)
-  removePreviousResultsOf(placeToInjectResults)
-
-  data.results.forEach(({urls}) => {
-    const htmlContent = setImageResultHTMLTemplateBy(urls.thumb)
-    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
-  })
-}
-
-function renderResultsNY(event) {
-  const placeToInjectResults = getElementBy('[data-inject="article-results"]')
-  setLoadingStateIn(placeToInjectResults)
-
-  const data = JSON.parse(event.target.responseText)
-  removePreviousResultsOf(placeToInjectResults)
-
-  data.response.docs.forEach(data => {
-    const htmlContent = setArticleResultHTMLTemplateBy(data)
-    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
-  })
-}
-
 function makeSearchRequestFrom(apiName, textToSearch) {
-  const { url, hasHeader, header } = getRequestReferencesOf(apiName)
-  const request = new XMLHttpRequest();
-  request.open('GET', setUrlFrom().toSearch(textToSearch))
-  if (hasHeader) request.setRequestHeader('Authorization', `setHeader()`)
+  return new Promise((resolve, reject) => {
+    const { url, hasHeader } = getRequestReferencesOf(apiName).toFind(textToSearch)
+    const requestApi = new XMLHttpRequest()
 
-  request.onload = renderResultsUnsplash
-  request.send()
+    requestApi.open('GET', url)
+    if (hasHeader) requestApi.setRequestHeader('Authorization', `${hasHeader}`)
+    requestApi.onload = (event) => resolve(parseToJSON(event.target))
+    requestApi.send()
+  })
 }
 
-function makeRequestUnsplash(textToSearch) {
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`)
-  request.setRequestHeader('Authorization', `Client-ID ${getAccessKeyOf('unsplash')}`)
-  request.onload = renderResultsUnsplash
-  request.send()
+function renderResultsOf(dataRequest, apiName, place) {
+  const placeToInjectResults = getElementBy(`[data-inject="${place}"]`)
+  console.log(dataRequest);
+  var dataResponse = extractArrayFrom(dataRequest, apiName)
+  removePreviousResultsOf(placeToInjectResults)
+
+  dataResponse.forEach(data => {
+    const template = setHTMLTemplateOf(apiName)
+    const htmlContent = template(data)
+    return placeToInjectResults.insertAdjacentHTML('afterbegin', htmlContent)
+  })
 }
 
-function makeRequestNY(textToSearch) {
-  const request = new XMLHttpRequest();
-  request.open('GET', `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${textToSearch}&api-key=${getAccessKeyOf('nytimes')}`)
-  request.onload = renderResultsNY
-  request.send()
+function extractArrayFrom(data, apiName) {
+  return {
+    'nytimes': data.response ? data.response.docs : data,
+    'unsplash': data.results ? data.results : data
+  }[apiName]
+}
+
+function parseToJSON(requestData) {
+  return JSON.parse(requestData.responseText)
 }
 
 function searchInput(event) {
@@ -164,15 +151,33 @@ function searchInput(event) {
   if (textToSearch) {
     setTimeout(() => {
       const loading = place.querySelector('[data-inject="loading"]')
-      makeRequestUnsplash(textToSearch)
-      makeRequestNY(textToSearch)
+      Promise.all([
+        makeSearchRequestFrom('nytimes', textToSearch),
+        makeSearchRequestFrom('unsplash', textToSearch)
+      ]).then(([nytimes, unsplash]) => {
+        console.log('nytimes', nytimes);
+        console.log('unsplash', unsplash);
+        renderResultsOf(nytimes, 'nytimes', 'article-results')
+        renderResultsOf(unsplash, 'unsplash', 'image-results')
+      })
+
       loading.remove()
-    }, 3000)
+    }, 2000)
   }
 }
 
 function conditionalSearch(event) {
 	if (event.keyCode === 13) searchInput(event)
+}
+
+function getRequestReferencesOf(apiName) {
+  return { toFind: function(textToSearch) {
+      return {
+        'nytimes': { url: `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${textToSearch}&api-key=${getAccessKeyOf('nytimes')}`, hasHeader: false },
+        'unsplash': { url: `https://api.unsplash.com/search/photos?page=1&query=${textToSearch}`, hasHeader: `Client-ID ${getAccessKeyOf('unsplash')}` }
+      }[apiName]
+    }
+  }
 }
 
 function setActionsToHTMLElements() {
@@ -188,6 +193,5 @@ setActionsToHTMLElements().forEach(({ target, event, action }) => {
 
 document.addEventListener('DOMContentLoaded', function() {
   const inputTargets = getEachElementsWith('[data-event="set-keys"]')
-
   handleCookieEventsIn(inputTargets)
 })
