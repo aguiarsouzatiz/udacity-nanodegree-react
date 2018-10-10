@@ -121,8 +121,7 @@ function makeSearchRequestFrom(apiName, textToSearch) {
 
 function renderResultsOf(dataRequest, apiName, place) {
   const placeToInjectResults = getElementBy(`[data-inject="${place}"]`)
-  console.log(dataRequest);
-  var dataResponse = extractArrayFrom(dataRequest, apiName)
+  const dataResponse = extractArrayFrom(apiName)(dataRequest)
   removePreviousResultsOf(placeToInjectResults)
 
   dataResponse.forEach(data => {
@@ -132,11 +131,19 @@ function renderResultsOf(dataRequest, apiName, place) {
   })
 }
 
-function extractArrayFrom(data, apiName) {
+function extractArrayFrom(apiName) {
   return {
-    'nytimes': data.response ? data.response.docs : data,
-    'unsplash': data.results ? data.results : data
+    'nytimes': extractByPropertyResponseDocs,
+    'unsplash': extractByPropertyResults
   }[apiName]
+}
+
+function extractByPropertyResponseDocs(data) {
+  return data.response.docs
+}
+
+function extractByPropertyResults(data) {
+  return data.results
 }
 
 function parseToJSON(requestData) {
@@ -154,8 +161,6 @@ function searchInput(event) {
       makeSearchRequestFrom('nytimes', textToSearch),
       makeSearchRequestFrom('unsplash', textToSearch)
     ]).then(([nytimes, unsplash]) => {
-      console.log('nytimes', nytimes);
-      console.log('unsplash', unsplash);
       renderResultsOf(nytimes, 'nytimes', 'article-results')
       renderResultsOf(unsplash, 'unsplash', 'image-results')
       loading.remove()
