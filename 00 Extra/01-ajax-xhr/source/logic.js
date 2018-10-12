@@ -1,18 +1,18 @@
 function searchInput(event) {
-  const place = getElementBy('[data-inject="search-results"]')
-  place.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate())
-
   const textToSearch = getElementBy('[data-input="search-text"]').value.trim()
 
   if (textToSearch) {
-    const loading = place.querySelector('[data-inject="loading"]')
+    const resultsPlace = getElementBy('[data-inject="search-results"]')
+    applyLoadingStateElementIn(resultsPlace)
+
     Promise.all([
       makeSearchRequestFrom('nytimes', textToSearch),
       makeSearchRequestFrom('unsplash', textToSearch)
     ]).then(([nytimes, unsplash]) => {
       renderResultsOf(nytimes, 'nytimes', 'article-results')
       renderResultsOf(unsplash, 'unsplash', 'image-results')
-      loading.remove()
+
+      removeLoadingStateElementIn(resultsPlace)
     })
   }
 }

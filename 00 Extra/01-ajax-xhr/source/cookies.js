@@ -10,7 +10,7 @@ function getCookieWith(key) {
   if (foundKeyCookie) return foundKeyCookie.trim()
 }
 
-function extarctContentOf(hasCookie) {
+function extractContentOf(hasCookie) {
   if (hasCookie) {
     const [ key, value ] = hasCookie.split('\=')
     return { key, value }
@@ -20,7 +20,7 @@ function extarctContentOf(hasCookie) {
 function setDefaultCookieValueIn(inputTarget) {
   const key = inputTarget.dataset.target
   const input = getElementBy(`[data-input="${key}"]`)
-  const targetCookie = extarctContentOf(getCookieWith(key))
+  const targetCookie = extractContentOf(getCookieWith(key))
 
   if (targetCookie) input.value = targetCookie.value
 }

@@ -6,5 +6,5 @@ function getAccessKeyOf(apiName) {
 }
 
 function handleStorageOfAccessKey(apiName) {
-  return extarctContentOf(getCookieWith(apiName)).value || getElementBy(`[data-input="${apiName}"]`).value
+  return extractContentOf(getCookieWith(apiName)).value || getElementBy(`[data-input="${apiName}"]`).value
 }

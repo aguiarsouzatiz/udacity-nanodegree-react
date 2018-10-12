@@ -8,7 +8,7 @@ function getAccessKeyOf(apiName) {
 }
 
 function handleStorageOfAccessKey(apiName) {
-  return extarctContentOf(getCookieWith(apiName)).value || getElementBy('[data-input="' + apiName + '"]').value;
+  return extractContentOf(getCookieWith(apiName)).value || getElementBy('[data-input="' + apiName + '"]').value;
 }
 'use strict';
 
@@ -28,7 +28,7 @@ function getCookieWith(key) {
   if (foundKeyCookie) return foundKeyCookie.trim();
 }
 
-function extarctContentOf(hasCookie) {
+function extractContentOf(hasCookie) {
   if (hasCookie) {
     var _hasCookie$split = hasCookie.split('\='),
         _hasCookie$split2 = _slicedToArray(_hasCookie$split, 2),
@@ -42,7 +42,7 @@ function extarctContentOf(hasCookie) {
 function setDefaultCookieValueIn(inputTarget) {
   var key = inputTarget.dataset.target;
   var input = getElementBy('[data-input="' + key + '"]');
-  var targetCookie = extarctContentOf(getCookieWith(key));
+  var targetCookie = extractContentOf(getCookieWith(key));
 
   if (targetCookie) input.value = targetCookie.value;
 }
@@ -110,6 +110,15 @@ function extractArrayFrom(apiName) {
 function conditionalSearch(event) {
   if (event.keyCode === 13) searchInput(event);
 }
+
+function removeLoadingStateElementIn(place) {
+  var loading = place.querySelector('[data-inject="loading"]');
+  return loading.remove();
+}
+
+function applyLoadingStateElementIn(place) {
+  return place.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate());
+}
 "use strict";
 
 function setImageResultHTMLTemplateBy(_ref) {
@@ -140,13 +149,12 @@ function setTimeValueBy() {
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function searchInput(event) {
-  var place = getElementBy('[data-inject="search-results"]');
-  place.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate());
-
   var textToSearch = getElementBy('[data-input="search-text"]').value.trim();
 
   if (textToSearch) {
-    var loading = place.querySelector('[data-inject="loading"]');
+    var resultsPlace = getElementBy('[data-inject="search-results"]');
+    applyLoadingStateElementIn(resultsPlace);
+
     Promise.all([makeSearchRequestFrom('nytimes', textToSearch), makeSearchRequestFrom('unsplash', textToSearch)]).then(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2),
           nytimes = _ref2[0],
@@ -154,7 +162,8 @@ function searchInput(event) {
 
       renderResultsOf(nytimes, 'nytimes', 'article-results');
       renderResultsOf(unsplash, 'unsplash', 'image-results');
-      loading.remove();
+
+      removeLoadingStateElementIn(resultsPlace);
     });
   }
 }

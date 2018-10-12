@@ -39,3 +39,12 @@ function extractArrayFrom(apiName) {
 function conditionalSearch(event) {
 	if (event.keyCode === 13) searchInput(event)
 }
+
+function removeLoadingStateElementIn(place) {
+  const loading = place.querySelector('[data-inject="loading"]')
+  return loading.remove()
+}
+
+function applyLoadingStateElementIn(place) {
+  return place.insertAdjacentHTML('afterbegin', setLoadingHTMLTemplate())
+}
