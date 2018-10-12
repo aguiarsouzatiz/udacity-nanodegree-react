@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "live-server": "npm run browser-sync start --files '**/*.html, **/*.js, !**/app.js.js, **/*.css' --port 4000 --server",
-    "babel-watch:xhr":"babel 01-ajax-xhr/app.js --out-file=01-ajax-xhr/assets/transpiled.js --presets=env --watch",
+    "live-server": "npm run browser-sync start --files '**/*.html, **/*.js, !**/app.js, **/*.css' --port 4000 --server",
+    "babel-watch:xhr":"babel 01-ajax-xhr/source/**.js --out-file=01-ajax-xhr/app.js --presets=env --watch",
     "start:xhr": "npm run babel-watch:xhr & live-server ./01-ajax-xhr",
     "start:jquery": "npm run live-server ./02-ajax-jQuery",
     "start:fetch": "npm run live-server ./03-ajax-fetch"
