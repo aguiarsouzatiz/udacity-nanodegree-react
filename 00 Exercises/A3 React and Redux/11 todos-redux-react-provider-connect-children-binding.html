@@ -564,7 +564,7 @@
             const { dispatch, getState } = this.props.store
             const storeState = this.props.store.getState()
 
-            const storeStateMappedToComponentProps = mapStoreStateToProps(storeState)
+            const storeStateMappedToComponentProps = mapStoreStateToProps ? mapStoreStateToProps(storeState) : null
 
             return <Component {...storeStateMappedToComponentProps} dispatch={store.dispatch} />
           }
@@ -577,16 +577,6 @@
         )
 
         return ConnectedComponent
-      }
-    }
-
-    class ConnectedApp extends React.Component {
-      render() {
-        return (
-          <Context.Consumer>
-            {store => <App store={store}/>}
-          </Context.Consumer>
-        )
       }
     }
 
@@ -620,12 +610,21 @@
       isLoading: storeState.loading
     }))(Goals)
 
+
+/*    class ConnectedApp extends React.Component {
+      render() {
+        return (
+          <Context.Consumer>
+            {store => <App store={store}/>}
+          </Context.Consumer>
+        )
+      }
+    } */
+
     class App extends React.Component {
 
       componentDidMount() {
-        const { store } = this.props
-        store.dispatch(fetchAsyncInitialData())
-        store.subscribe(() => this.forceUpdate())
+        this.props.dispatch(fetchAsyncInitialData())
       }
 
       render() {
@@ -637,6 +636,8 @@
         )
       }
     }
+
+    const ConnectedApp = connect()(App)
 
     ReactDOM.render(
       <Provider store={store}>
