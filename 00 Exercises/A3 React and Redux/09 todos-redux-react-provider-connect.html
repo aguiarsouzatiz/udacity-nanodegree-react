@@ -412,7 +412,7 @@
             API.fetchTodos(),
             API.fetchGoals()
               ]).then(([ todos, goals ]) => {
-              dispatch(receiveDataAction(todos, goals))
+                dispatch(receiveDataAction(todos, goals))
           })
       }
     }
